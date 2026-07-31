@@ -158,8 +158,10 @@ The on-demand process panel computes, per descendant:
 distro); it cannot be queried without executing code in the distro, and a
 deviation would only scale display figures, never affect liveness.
 
-The existing `vmmem` context row remains and is now genuinely the row where a
-WSL session's real load lives.
+The existing `vmmem` context row remains what it is today: context for a
+*Windows* session whose descendants include a WSL relay. A WSL-origin session
+does not need it - its per-descendant rows from `/proc` already show the real
+load individually, which the machine-wide VM figure never could.
 
 ## Feature parity
 
