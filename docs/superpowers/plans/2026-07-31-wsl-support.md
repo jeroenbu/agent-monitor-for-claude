@@ -270,9 +270,6 @@ class ProbeWslSessionsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as base:
             root = self._root(base)
             _write_stat(root.proc_dir, 100, 'claude', 1, 5000)
-            result = wsl.probe_wsl_sessions(root, [(100, 5000), (100, 4999), (200, None)])
-            # Note: dict keyed by pid, so pass conflicting requests separately in real code;
-            # here assert per-call:
             self.assertTrue(wsl.probe_wsl_sessions(root, [(100, 5000)])[100].alive)
             self.assertFalse(wsl.probe_wsl_sessions(root, [(100, 4999)])[100].alive)   # recycled
             self.assertFalse(wsl.probe_wsl_sessions(root, [(200, None)])[200].alive)   # gone
@@ -497,7 +494,7 @@ def test_refuses_unknown_origin(self):
 - Produces (window_focus.py): `focus_terminal_window(session_title: str) -> bool` - enum windows, `select_terminal_window(windows, process_names(), session_title)`, activate. No pid parameter; add to `__all__`.
 - Produces (app.py):
   - `focus_session(pid, project_name='', session_id='', vscode_deeplink=False, session_title='', origin='windows')` - when `isinstance(origin, str) and origin.startswith('wsl:')`: return `focus_terminal_window(title)` (a Linux pid must never reach `focus_session_window` - a colliding Windows pid would raise the wrong window); else unchanged.
-  - `delete_session(session_id, cwd, origin='windows')`, `get_tasks(..., origin='windows')`, `read_task_output(..., origin='windows')`, `scratchpad_path(session_id, cwd, origin='windows')` - each resolves `root_for_origin(origin)`, refuses (False/empty) on None, passes `root` down. (`get_tasks`/`read_task_output` pass `windows_root()`-equivalent root through to the still-single-root `tasks.py`; full WSL task support lands in Task 14 - until then a WSL origin resolves the root and `tasks.py` simply finds no files under a nonexistent UNC temp dir, which degrades to an empty list.)
+  - `delete_session(session_id, cwd, origin='windows')`, `get_tasks(..., origin='windows')`, `read_task_output(..., origin='windows')`, `scratchpad_path(session_id, cwd, origin='windows')` - each resolves `root_for_origin(origin)` and refuses (False/empty/`{'tasks': [], 'total': 0}`) on None. `scratchpad_path` is fully origin-correct here already: it calls `scratchpad_dir(root, ...)` (root-parameterized since Task 2). `get_tasks`/`read_task_output` validate the origin but still call the single-root `tasks.py` API (its functions gain a root parameter only in Task 14); until then a WSL origin yields the empty/None result those functions produce for absent files - the documented interim degradation.
   - `open_path(path, origin='windows')` - `root = root_for_origin(origin)`; None -> False; `open_directory(wsl_path_to_windows(root, path))`.
   - `get_process_stats(pid, origin='windows')` - WSL origin returns `[]` for now (Task 13 fills it in); the registry lookup for `proc_start_ticks` moves to the matching root's `list_sessions(root)`.
 - Consumes: everything above.
