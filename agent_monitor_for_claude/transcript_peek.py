@@ -24,17 +24,14 @@ import re
 from typing import Any
 
 from .paths import SessionRoot, projects_dir, transcript_path
-# The wrapper-stripping pattern and the tail reader are transcript.py's
+# The wrapper/command patterns and the tail reader are transcript.py's
 # knowledge of Claude Code's file framing; reusing them keeps the two views of
 # a prompt identical and leaves one copy of the tail-reading subtleties.
-from .transcript import _WRAPPER_PATTERN, _read_tail
+from .transcript import _COMMAND_ARGS_PATTERN, _COMMAND_NAME_PATTERN, _WRAPPER_PATTERN, _read_tail
 
 __all__ = ['read_peek']
 
 _SESSION_ID_PATTERN = re.compile(r'\A[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\Z')
-
-_COMMAND_NAME_PATTERN = re.compile(r'<command-name>(.*?)</command-name>', re.S)
-_COMMAND_ARGS_PATTERN = re.compile(r'<command-args>(.*?)</command-args>', re.S)
 
 # One tail read per dialog refresh; the last dozen turns fit comfortably.
 _PEEK_TAIL_BYTES = 262144
