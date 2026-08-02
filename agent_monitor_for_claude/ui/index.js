@@ -199,6 +199,8 @@ const DEFAULT_LABELS = {
     copied: 'Copied to clipboard',
     open_in_explorer: 'Open in Explorer',
     open_scratchpad: 'Open scratchpad',
+    peek_transcript: 'Peek at the last turns',
+    peek_empty: 'Nothing to show yet.',
     filter_history: 'History',
     filter_history_tip: 'Past sessions that are no longer running (loaded on demand)',
     history_loading: 'Loading past sessions…',
@@ -1516,6 +1518,114 @@ function closeConfirm() {
     document.removeEventListener('keydown', onConfirmKey, true);
 }
 
+/* --- transcript peek (personal build) ---
+
+   A modal that shows the session's last conversation turns, refreshed every
+   second while it stays open. The read happens only here, on demand - the
+   per-second snapshot poll stays content-free (see transcript_peek.py and the
+   personal-build note in PRIVACY.md). Every piece of transcript text enters
+   the DOM through textContent - never through markup strings. */
+
+let peekTimer = null;
+
+function showPeek(sessionId, cwd, origin, sessionName) {
+    closePeek();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'peek-overlay';
+    overlay.innerHTML = '<div class="modal peek" role="dialog" aria-modal="true">'
+        + '<div class="modal-title"></div>'
+        + '<div class="peek-list" tabindex="0"></div>'
+        + '<div class="modal-actions">'
+        +     '<button class="modal-btn" type="button" data-act="close"></button>'
+        + '</div></div>';
+
+    overlay.querySelector('.modal-title').textContent = sessionName || sessionId;
+
+    const closeBtn = overlay.querySelector('[data-act="close"]');
+    closeBtn.textContent = state.labels.proc_close || 'Close';
+    closeBtn.addEventListener('click', closePeek);
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+            closePeek();
+        }
+    });
+
+    document.addEventListener('keydown', onPeekKey, true);
+    document.body.appendChild(overlay);
+    closeBtn.focus();
+
+    const listEl = overlay.querySelector('.peek-list');
+    refreshPeek(listEl, sessionId, cwd, origin, true);
+    peekTimer = setInterval(() => refreshPeek(listEl, sessionId, cwd, origin, false), 1000);
+}
+
+async function refreshPeek(listEl, sessionId, cwd, origin, firstFill) {
+    const bridge = apiBridge();
+    if (!bridge || typeof bridge.get_transcript_peek !== 'function' || !listEl.isConnected) {
+        return;
+    }
+
+    // A selection inside the list survives the refresh: skip this tick, like
+    // the task console does, so Ctrl+C never loses its selection mid-copy.
+    const selection = document.getSelection();
+    if (selection && !selection.isCollapsed && listEl.contains(selection.anchorNode)) {
+        return;
+    }
+
+    let items = [];
+    try {
+        items = (await bridge.get_transcript_peek(sessionId, cwd, origin)) || [];
+    } catch (err) {
+        return;
+    }
+    if (!listEl.isConnected) {
+        return;
+    }
+
+    const atBottom = listEl.scrollHeight - listEl.scrollTop - listEl.clientHeight < 8;
+    const fragment = document.createDocumentFragment();
+    if (!items.length) {
+        const empty = document.createElement('div');
+        empty.className = 'peek-item peek-empty';
+        empty.textContent = state.labels.peek_empty || 'Nothing to show yet.';
+        fragment.appendChild(empty);
+    }
+    for (const item of items) {
+        const role = item && typeof item.role === 'string' ? item.role : '';
+        const entry = document.createElement('div');
+        entry.className = 'peek-item'
+            + (role === 'user' ? ' peek-user' : role === 'tool' ? ' peek-tool' : ' peek-assistant');
+        entry.textContent = (role === 'user' ? '› ' : role === 'tool' ? '⚙ ' : '∙ ')
+            + String(item && item.text != null ? item.text : '');
+        fragment.appendChild(entry);
+    }
+    listEl.replaceChildren(fragment);
+
+    if (firstFill || atBottom) {
+        listEl.scrollTop = listEl.scrollHeight;
+    }
+}
+
+function onPeekKey(event) {
+    if (event.key === 'Escape') {
+        closePeek();
+    }
+}
+
+function closePeek() {
+    if (peekTimer !== null) {
+        clearInterval(peekTimer);
+        peekTimer = null;
+    }
+    const overlay = document.getElementById('peek-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+    document.removeEventListener('keydown', onPeekKey, true);
+}
+
 /* --- filtering --- */
 
 // Each status chip is a checkbox, all on by default. A session shows only while
@@ -2470,6 +2580,9 @@ async function openRowMenu(menuBtn) {
     }
 
     const items = [{ key: 'copy-id', label: state.labels.copy_session_id }];
+    if (apiBridge()) {
+        items.push({ key: 'peek', label: state.labels.peek_transcript });
+    }
     if (scratchpad) {
         items.push({ key: 'scratchpad', label: state.labels.open_scratchpad });
     }
@@ -2480,6 +2593,8 @@ async function openRowMenu(menuBtn) {
     openMenu(menuBtn, items, (key) => {
         if (key === 'copy-id') {
             copyToClipboard(sessionId);
+        } else if (key === 'peek') {
+            showPeek(sessionId, cwd, origin, rowCellText(rowEl, '.name'));
         } else if (key === 'scratchpad') {
             openPath(scratchpad, origin);
         } else if (key === 'delete') {

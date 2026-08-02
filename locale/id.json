@@ -91,6 +91,8 @@
     "sort_direction_hint": "Beralih antara urutan naik dan turun",
     "open_in_explorer": "Buka di File Explorer",
     "open_scratchpad": "Buka scratchpad",
+    "peek_transcript": "Lihat giliran terakhir",
+    "peek_empty": "Belum ada yang ditampilkan.",
     "filter_history": "Riwayat",
     "filter_history_tip": "Sesi lampau yang tidak lagi berjalan (dimuat sesuai permintaan)",
     "history_loading": "Memuat sesi lampau…",

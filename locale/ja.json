@@ -91,6 +91,8 @@
     "sort_direction_hint": "昇順と降順を切り替える",
     "open_in_explorer": "エクスプローラーで開く",
     "open_scratchpad": "スクラッチパッドを開く",
+    "peek_transcript": "直近のやり取りを見る",
+    "peek_empty": "まだ表示するものがありません。",
     "filter_history": "履歴",
     "filter_history_tip": "実行中でない過去のセッション（必要に応じて読み込み）",
     "history_loading": "過去のセッションを読み込み中…",

@@ -91,6 +91,8 @@
     "sort_direction_hint": "在升序和降序之间切换",
     "open_in_explorer": "在资源管理器中打开",
     "open_scratchpad": "打开暂存目录",
+    "peek_transcript": "查看最近对话",
+    "peek_empty": "暂无内容。",
     "filter_history": "历史",
     "filter_history_tip": "不再运行的过往会话（按需加载）",
     "history_loading": "正在加载过往会话…",

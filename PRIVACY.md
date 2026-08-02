@@ -7,6 +7,17 @@ it shows, what it writes, and what it never does.
 
 Last reviewed: 2026-08-01
 
+> **Personal build.** This fork branch adds one deliberate exception to the
+> upstream promises below: a per-session "Peek at the last turns" dialog that,
+> on an explicit menu click, reads and shows the last few conversation turns
+> (your prompts, the assistant's text, and one line naming each tool call with
+> its stated description or file path - never a tool's result). It is read
+> only while that dialog is open, never on the per-second poll, and is
+> confined to the session's own transcript exactly like the search surface
+> (`transcript_peek.py`, guarded by `tests/test_transcript_peek.py`). The
+> upstream project does not carry this feature; every other statement in this
+> document is unchanged.
+
 ## At a glance
 
 | Question | Answer |

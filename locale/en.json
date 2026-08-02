@@ -91,6 +91,8 @@
     "sort_direction_hint": "Switch between ascending and descending order",
     "open_in_explorer": "Open in Explorer",
     "open_scratchpad": "Open scratchpad",
+    "peek_transcript": "Peek at the last turns",
+    "peek_empty": "Nothing to show yet.",
     "filter_history": "History",
     "filter_history_tip": "Past sessions that are no longer running (loaded on demand)",
     "history_loading": "Loading past sessions…",

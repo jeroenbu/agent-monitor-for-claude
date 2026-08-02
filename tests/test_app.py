@@ -392,5 +392,36 @@ class StartSearchSeqTest(unittest.TestCase):
         self.assertEqual(api._search_seq, 1)
 
 
+class TranscriptPeekBridgeTest(unittest.TestCase):
+    _SID = 'aaaaaaaa-1111-2222-3333-444444444444'
+
+    def test_routes_to_read_peek_with_the_resolved_root(self) -> None:
+        api = _MonitorApi()
+        with mock.patch.object(app, 'root_for_origin', return_value=mock.sentinel.root) as resolve, \
+                mock.patch.object(app, 'read_peek', return_value=[{'role': 'user', 'text': 'hi'}]) as reader:
+            result = api.get_transcript_peek(self._SID, 'd:\\proj', 'wsl:U')
+
+        resolve.assert_called_once_with('wsl:U')
+        reader.assert_called_once_with(mock.sentinel.root, self._SID, 'd:\\proj')
+        self.assertEqual(result, [{'role': 'user', 'text': 'hi'}])
+
+    def test_an_unknown_origin_refuses_without_reading(self) -> None:
+        api = _MonitorApi()
+        with mock.patch.object(app, 'root_for_origin', return_value=None), \
+                mock.patch.object(app, 'read_peek') as reader:
+            self.assertEqual(api.get_transcript_peek(self._SID, 'd:\\proj', 'gone:X'), [])
+
+        reader.assert_not_called()
+
+    def test_non_string_arguments_refuse(self) -> None:
+        api = _MonitorApi()
+        with mock.patch.object(app, 'read_peek') as reader:
+            self.assertEqual(api.get_transcript_peek(5, 'd:\\proj'), [])
+            self.assertEqual(api.get_transcript_peek(self._SID, None), [])
+            self.assertEqual(api.get_transcript_peek(self._SID, 'd:\\proj', 7), [])
+
+        reader.assert_not_called()
+
+
 if __name__ == '__main__':
     unittest.main()

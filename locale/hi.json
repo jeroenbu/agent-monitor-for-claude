@@ -91,6 +91,8 @@
     "sort_direction_hint": "आरोही और अवरोही क्रम के बीच बदलें",
     "open_in_explorer": "एक्सप्लोरर में खोलें",
     "open_scratchpad": "स्क्रैचपैड खोलें",
+    "peek_transcript": "हाल की बातचीत देखें",
+    "peek_empty": "अभी दिखाने के लिए कुछ नहीं।",
     "filter_history": "इतिहास",
     "filter_history_tip": "पुराने सेशन जो अब नहीं चल रहे (माँग पर लोड होते हैं)",
     "history_loading": "पुराने सेशन लोड हो रहे हैं…",

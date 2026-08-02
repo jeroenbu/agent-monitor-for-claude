@@ -1581,6 +1581,52 @@ body {
         justify-content: flex-end;
         gap: 10px;
     }
+
+    /* The transcript-peek dialog (personal build): wider than a confirm, with
+       a scrolling mono list of the session's last turns between title and
+       actions. */
+    &.peek {
+        max-width: 720px;
+    }
+}
+
+.peek-list {
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    max-height: min(52vh, 460px);
+    overflow-y: auto;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-control);
+    background: var(--control-bg);
+    font-family: Consolas, 'Cascadia Mono', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    user-select: text;
+
+    .peek-item {
+        margin-bottom: 6px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        color: var(--fg);
+
+        &.peek-user {
+            color: var(--fg-heading);
+            font-weight: 600;
+        }
+
+        &.peek-tool {
+            color: var(--fg-dim);
+        }
+
+        &.peek-empty {
+            color: var(--fg-dim);
+            font-style: italic;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
 }
 
 .modal-btn {

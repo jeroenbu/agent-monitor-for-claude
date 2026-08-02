@@ -35,6 +35,7 @@ from .settings import POLL_INTERVAL, WINDOW_HEIGHT, WINDOW_WIDTH
 from .snapshot import build_snapshot, registry_fingerprint
 from .tasks import list_tasks
 from .tasks import read_task_output as _read_task_output
+from .transcript_peek import read_peek
 from .verbose import print_runtime_diagnostics
 from .window_background import apply_native_background, window_background_color
 from .window_focus import focus_session_window, focus_terminal_window, open_directory, open_vscode_session
@@ -248,6 +249,27 @@ class _MonitorApi:
             return None
 
         return _read_task_output(root, session_id, cwd, task_id)
+
+    def get_transcript_peek(self, session_id: object, cwd: object, origin: object = 'windows') -> list[dict[str, str]]:
+        """Return the session's last conversation turns for the peek dialog.
+
+        Personal-build surface (see the note in ``PRIVACY.md``): the one bridge
+        method that shows conversation text.  Read only while the user has the
+        peek dialog open - never on the snapshot poll - and confined to the
+        session's own transcript with the same id validation and path
+        confinement as the search and deletion surfaces (``transcript_peek``).
+        """
+        if not isinstance(session_id, str) or not isinstance(cwd, str):
+            return []
+
+        if not isinstance(origin, str):
+            return []
+
+        root = root_for_origin(origin)
+        if root is None:
+            return []
+
+        return read_peek(root, session_id, cwd)
 
     def start_search(self, query: object, sessions: object, options: object, seq: object) -> bool:
         """Start a streaming content search over the given in-view sessions.

@@ -91,6 +91,8 @@
     "sort_direction_hint": "Alterna tra ordine crescente e decrescente",
     "open_in_explorer": "Apri in Esplora file",
     "open_scratchpad": "Apri scratchpad",
+    "peek_transcript": "Vedi gli ultimi turni",
+    "peek_empty": "Ancora niente da mostrare.",
     "filter_history": "Cronologia",
     "filter_history_tip": "Sessioni passate non più in esecuzione (caricate su richiesta)",
     "history_loading": "Caricamento delle sessioni passate…",

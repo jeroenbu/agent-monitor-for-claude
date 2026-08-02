@@ -91,6 +91,8 @@
     "sort_direction_hint": "오름차순과 내림차순 전환",
     "open_in_explorer": "탐색기에서 열기",
     "open_scratchpad": "스크래치패드 열기",
+    "peek_transcript": "최근 대화 보기",
+    "peek_empty": "아직 표시할 내용이 없습니다.",
     "filter_history": "기록",
     "filter_history_tip": "더 이상 실행 중이 아닌 지난 세션 (필요할 때 로드)",
     "history_loading": "지난 세션을 불러오는 중…",

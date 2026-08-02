@@ -91,6 +91,8 @@
     "sort_direction_hint": "在升冪與降冪之間切換",
     "open_in_explorer": "在檔案總管中開啟",
     "open_scratchpad": "開啟暫存目錄",
+    "peek_transcript": "檢視最近對話",
+    "peek_empty": "尚無內容。",
     "filter_history": "歷史",
     "filter_history_tip": "不再執行的過往工作階段（依需求載入）",
     "history_loading": "正在載入過往工作階段…",

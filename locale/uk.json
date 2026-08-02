@@ -91,6 +91,8 @@
     "sort_direction_hint": "Перемикання між зростанням і спаданням",
     "open_in_explorer": "Відкрити в Провіднику",
     "open_scratchpad": "Відкрити scratchpad",
+    "peek_transcript": "Переглянути останні репліки",
+    "peek_empty": "Поки що нічого показувати.",
     "filter_history": "Історія",
     "filter_history_tip": "Минулі сесії, які більше не виконуються (завантажуються за потреби)",
     "history_loading": "Завантаження минулих сесій…",

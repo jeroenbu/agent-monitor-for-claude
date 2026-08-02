@@ -91,6 +91,8 @@
     "sort_direction_hint": "Basculer entre l'ordre croissant et décroissant",
     "open_in_explorer": "Ouvrir dans l'Explorateur",
     "open_scratchpad": "Ouvrir le scratchpad",
+    "peek_transcript": "Voir les derniers échanges",
+    "peek_empty": "Rien à afficher pour l'instant.",
     "filter_history": "Historique",
     "filter_history_tip": "Sessions passées qui ne sont plus en cours (chargées à la demande)",
     "history_loading": "Chargement des sessions passées…",
