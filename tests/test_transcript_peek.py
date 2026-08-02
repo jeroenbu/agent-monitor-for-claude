@@ -61,6 +61,23 @@ class PeekContentTest(unittest.TestCase):
 
         self.assertNotIn('SECRET_RESULT_TEXT', json.dumps(items))
 
+    def test_a_mixed_text_and_tool_result_entry_shows_only_the_text(self) -> None:
+        # An interrupt during a tool call writes one user entry carrying both a
+        # text block and the tool_result: the text may show, the result never.
+        with tempfile.TemporaryDirectory() as base:
+            root = _write(base, [
+                {'type': 'user', 'message': {'content': [
+                    {'type': 'tool_result', 'tool_use_id': 't1', 'content': 'SECRET_RESULT_TEXT'},
+                    {'type': 'text', 'text': '[Request interrupted by user]'},
+                ]}},
+            ])
+
+            items = read_peek(root, SID, CWD)
+
+        joined = json.dumps(items)
+        self.assertNotIn('SECRET_RESULT_TEXT', joined)
+        self.assertIn('[Request interrupted by user]', joined)
+
     def test_tool_marker_reads_only_description_and_file_path(self) -> None:
         with tempfile.TemporaryDirectory() as base:
             root = _write(base, [

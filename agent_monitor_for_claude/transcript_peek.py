@@ -20,15 +20,14 @@ says so out loud - but keeps its discipline everywhere else:
 from __future__ import annotations
 
 import json
-import os
 import re
-from pathlib import Path
 from typing import Any
 
 from .paths import SessionRoot, projects_dir, transcript_path
-# The wrapper-stripping pattern is transcript.py's knowledge of Claude Code's
-# prompt framing; reusing it keeps the two views of a prompt identical.
-from .transcript import _WRAPPER_PATTERN
+# The wrapper-stripping pattern and the tail reader are transcript.py's
+# knowledge of Claude Code's file framing; reusing them keeps the two views of
+# a prompt identical and leaves one copy of the tail-reading subtleties.
+from .transcript import _WRAPPER_PATTERN, _read_tail
 
 __all__ = ['read_peek']
 
@@ -77,31 +76,12 @@ def read_peek(root: SessionRoot, session_id: str, cwd: str, *, max_entries: int 
         return []
 
     items: list[dict[str, str]] = []
-    for line in _tail_lines(path):
+    for line in _read_tail(path, _PEEK_TAIL_BYTES):
         entry = _load(line)
         if entry is not None:
             items.extend(_entry_items(entry))
 
     return items[-max_entries:]
-
-
-def _tail_lines(path: Path) -> list[str]:
-    """Return the last lines of *path*, dropping a leading partial line."""
-    try:
-        with path.open('rb') as handle:
-            handle.seek(0, os.SEEK_END)
-            size = handle.tell()
-            start = max(0, size - _PEEK_TAIL_BYTES)
-            handle.seek(start)
-            data = handle.read()
-    except OSError:
-        return []
-
-    lines = data.decode('utf-8', errors='ignore').split('\n')
-    if start > 0 and lines:
-        return lines[1:]
-
-    return lines
 
 
 def _entry_items(entry: dict) -> list[dict[str, str]]:
